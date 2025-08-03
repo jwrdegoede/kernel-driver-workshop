@@ -218,6 +218,8 @@ static int i2c_ch341_usb_probe(struct usb_interface *iface,
 	if (ret)
 		return ret;
 
+	dev_info(&dev->adapter.dev, "I2C bus registered\n");
+
 	return i2c_ch341_usb_instantiate_sht40_client(dev);
 }
 
