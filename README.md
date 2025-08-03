@@ -79,7 +79,7 @@ be done by sending a single byte command with value 0x89 to the sensor, then
 sleeping a bit and then reading back 6 bytes. Here is some example code:
 
 ```
-	char buf[6];
+	char resp[6];
 	int ret;
 
 	ret = i2c_smbus_write_byte(data->client, 0xXX);
@@ -90,7 +90,7 @@ sleeping a bit and then reading back 6 bytes. Here is some example code:
 
 	fsleep(1 * USEC_PER_MSEC); 
 
-	ret = i2c_transfer_buffer_flags(data->client, buf, 6, I2C_M_RD);
+	ret = i2c_transfer_buffer_flags(data->client, resp, 6, I2C_M_RD);
 	if (ret != 6) {
 		dev_err(dev, "Read bytes error: %d\n", ret);
 		return (ret < 0) ? ret : -EIO;
@@ -103,7 +103,7 @@ set consists of MSB, LSB + CRC8. So to output the serial number the 3th and
 6th bytes returned which are CRC bytes should be ignored, e.g. do:
 
 ```
-	sysfs_emit(buf, "%02x%02x%02x%02x\n", buf[0], buf[1], buf[3], buf[4]);
+	sysfs_emit(buf, "%02x%02x%02x%02x\n", resp[0], resp[1], resp[3], resp[4]);
 ```
 
 After making modificications to add a 'serialno' sysfs attribute, run
