@@ -11,6 +11,7 @@
 #include <linux/mod_devicetable.h>
 #include <linux/module.h>
 #include <linux/sysfs.h>
+#include <linux/unaligned.h>
 
 struct sht40_data {
 	struct i2c_client *client;
@@ -70,5 +71,5 @@ static struct i2c_driver sht40_driver = {
 module_i2c_driver(sht40_driver);
 
 MODULE_DESCRIPTION("Simple skeleton driver for Sensorion SHT4x sensors");
-MODULE_AUTHOR("Hans de Goede <hdegoede@redhat.com>");
+MODULE_AUTHOR("Hans de Goede <hansg@kernel.org>");
 MODULE_LICENSE("GPL");
