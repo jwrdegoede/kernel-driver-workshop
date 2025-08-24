@@ -12,6 +12,9 @@ a stub Linux i2c_client driver as starting point.
 1. [Preparation](#preparation)
 2. [Smoke Test](#smoke-test)
 3. [Serial Number Output](#serial-number-output)
+4. [Temperature Output](#temperature-output)
+5. [Humidity Output](#humidity-output)
+6. [All Done](#all-done)
 
 ## Preparation
 
@@ -111,3 +114,70 @@ the following commands to test this:
 
 1. `make && sudo rmmod sht40 && sudo insmod sht40.ko`
 2. `cat /sys/bus/i2c/devices/i2c-sht40/serialno`
+
+## Temperature Output
+
+Getting the serial number is of limited use, lets get to the good stuff and
+get the temperature from the sensor. Paragraph "4.5 Command Overview"
+of the [datasheet](https://sensirion.com/media/documents/1D662E57/67BD83A2/HT_DS_Datasheet_SHT4xI-Digital_1.pdf)
+shows a whole bunch of commands, some of these turn on the built in heater
+which is only necessary for special use-cases and will influency
+the temperature reading.
+
+So lets go with command 0xFD which reads the temperature and humidity with
+high precision. See paragraph "3.2 Timings" and use max time for a "High
+repeatability" measurement as delay between sending the command and reading
+the 6 bytes response.
+
+The temperature is in 16 bit big-endian format in bytes 0 and 1 of
+the response, to convert this to a native CPU-endianness integer do:
+
+```
+	int raw = get_unaligned_be16(&resp[0]);
+```
+
+See paragraph "4.6 Conversion of Signal Output" formula 3 to convert this
+raw value to degrees Celsius. Note it is not allowed to use floating point
+code inside the kernel. A trick to still get 1/10th degree precision is to
+multiply the 45 and 175 values in the formula by 10, using 450 and 1750
+instead. And then use something like the code below to show the temp:
+
+```
+	return sysfs_emit(buf, "%d.%d° Celsius\n", temp / 10, temp % 10);
+```
+
+## Humidity Output
+
+Humidity and temperature are measured at the same time using a single
+command, so for the humidity reading the temperature reading code can
+be re-used. Except that the raw 16 bit big-endian humidty value is stored
+in bytes 3 and 4 of the response, so getting it can be done by:
+
+```
+	int raw = get_unaligned_be16(&resp[3]);
+```
+
+See paragraph "4.6 Conversion of Signal Output" formula 1 to convert this
+raw value to a relative humidity percentage. Note using floating point
+arithmetics is still not allowed.
+
+## All Done
+
+That's it, you've just created your first simple kernel driver.
+
+Possible improvements:
+1. So far the driver is ignoring the 8bit crcs stored in resp[2] and resp[5]
+   a proper driver really should check these and retry the measurement if
+   the crc fails due to a communication error on the i2c bus.
+
+2. The temp and humidity sysfs attributes introduced by this driver are
+   a simple way to implement a userspace interface to get the measurements,
+   but these do not follow any existing standard kernel userspace APIs.
+
+   For sensors like this the kernel uses the standard
+   [Industrial I/O](https://docs.kernel.org/driver-api/iio/index.html)
+   userspace API. So a proper driver for the SHT40 humidity sensor should
+   implement this API. There is no SHT4x driver upstream yet, so if you feel
+   up to the challenge this could be your first upstream driver
+   contribution. Note that writing an actual IIO driver is somewhat more
+   involved then the simple driver from this workshop.
