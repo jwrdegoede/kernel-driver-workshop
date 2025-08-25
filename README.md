@@ -1,7 +1,7 @@
 # My first kernel driver workshop
 
 Workshop attendees will be given an USB (CH341T) to I2C converter + an I2C SHT40
-temperature/humidity sensor. The workship involves writing a simple kernel
+temperature/humidity sensor. The workshop involves writing a simple kernel
 driver to read the temperature and humidity from this sensor.
 
 This git repo contains a driver for the CH341T i2c_adapter driver and
@@ -26,12 +26,14 @@ distribution, this is necessary to avoid a version mismatch between
 the main and devel kernel packages.
     * Fedora/RHEL: `sudo dnf update 'kernel*'`
     * Debian/Ubuntu: `sudo apt update; sudo apt install linux-image-$(dpkg --print-architecture)`
+    * Arch Linux: `sudo pacman -Syu linux-headers`
 
 2. If the above command installed a new kernel, then reboot into the new kernel.
 3. Install build tools and the devel package for the kernel which provides
 the necessary C headers for building kernel modules:
-    * Fedora/RHEL: `sudo dnf install make gcc kernel-devel`
-    * Debian/Ubuntu: `sudo apt install build-essential linux-headers-$(uname -r)`
+    * Fedora/RHEL: `sudo dnf install make gcc kernel-devel i2c-tools`
+    * Debian/Ubuntu: `sudo apt install build-essential linux-headers-$(uname -r) i2c-tools`
+    * Arch Linux: `sudo pacman -S base-devel i2c-tools`
 4. Clone this git repo: `git clone https://github.com/jwrdegoede/kernel-driver-workshop.git`
 5. Build the provided drivers: `cd kernel-driver-workshop; make`
 6. Test that inserting kernel modules works: `sudo insmod i2c-ch341-usb.ko`
@@ -120,7 +122,7 @@ set consists of MSB, LSB + CRC8. So to output the serial number the 3th and
 	sysfs_emit(buf, "%02x%02x%02x%02x\n", resp[0], resp[1], resp[3], resp[4]);
 ```
 
-After making modificications to add a 'serialno' sysfs attribute, run
+After making modifications to add a 'serialno' sysfs attribute, run
 the following commands to test this:
 
 1. `make && sudo rmmod sht40 && sudo insmod sht40.ko`
@@ -132,7 +134,7 @@ Getting the serial number is of limited use, lets get to the good stuff and
 get the temperature from the sensor. Paragraph "4.5 Command Overview"
 of the [datasheet](https://sensirion.com/media/documents/1D662E57/67BD83A2/HT_DS_Datasheet_SHT4xI-Digital_1.pdf)
 shows a whole bunch of commands, some of these turn on the built in heater
-which is only necessary for special use-cases and will influency
+which is only necessary for special use-cases and will influence
 the temperature reading.
 
 So lets go with command 0xFD which reads the temperature and humidity with
@@ -161,7 +163,7 @@ instead. And then use something like the code below to show the temp:
 
 Humidity and temperature are measured at the same time using a single
 command, so for the humidity reading the temperature reading code can
-be re-used. Except that the raw 16 bit big-endian humidty value is stored
+be re-used. Except that the raw 16 bit big-endian humidity value is stored
 in bytes 3 and 4 of the response, so getting it can be done by:
 
 ```
