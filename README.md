@@ -47,6 +47,17 @@ the necessary C headers for building kernel modules:
       command now works.
     * You can re-enable secure-boot key validation after the workshop by
       running: `sudo mokutil --enable-validation`
+7. The used CH341T to I2C adapter has an in kernel driver for using
+   the chip in SPI mode, which will get in the way of using the i2c-adapter
+   driver. This driver must be disabled before inserting the provided
+   CH341T USB device. To disable this driver run:
+   `echo 'blacklist spi_ch341' | sudo tee /etc/modprobe.d/spi_ch341.conf`
+
+   If you've already inserted the CH341T USB device, remove the driver
+   by running: `sudo rmmod spi_ch341`
+8. The Smoke Test below requires the i2c-tools package, to install this run:
+    * Fedora/RHEL: `sudo dnf install i2c-tools`
+    * Debian/Ubuntu: `sudo apt install i2c-tools`
 
 ## Smoke Test
 
