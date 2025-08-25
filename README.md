@@ -1,7 +1,7 @@
 # My first kernel driver workshop
 
 Workshop attendees will be given an USB (CH341T) to I2C converter + an I2C SHT40
-temperature/humidity sensor. The workship involves writing a simple kernel
+temperature/humidity sensor. The workshop involves writing a simple kernel
 driver to read the temperature and humidity from this sensor.
 
 This git repo contains a driver for the CH341T i2c_adapter driver and
@@ -120,7 +120,7 @@ set consists of MSB, LSB + CRC8. So to output the serial number the 3th and
 	sysfs_emit(buf, "%02x%02x%02x%02x\n", resp[0], resp[1], resp[3], resp[4]);
 ```
 
-After making modificications to add a 'serialno' sysfs attribute, run
+After making modifications to add a 'serialno' sysfs attribute, run
 the following commands to test this:
 
 1. `make && sudo rmmod sht40 && sudo insmod sht40.ko`
@@ -132,7 +132,7 @@ Getting the serial number is of limited use, lets get to the good stuff and
 get the temperature from the sensor. Paragraph "4.5 Command Overview"
 of the [datasheet](https://sensirion.com/media/documents/1D662E57/67BD83A2/HT_DS_Datasheet_SHT4xI-Digital_1.pdf)
 shows a whole bunch of commands, some of these turn on the built in heater
-which is only necessary for special use-cases and will influency
+which is only necessary for special use-cases and will influence
 the temperature reading.
 
 So lets go with command 0xFD which reads the temperature and humidity with
@@ -161,7 +161,7 @@ instead. And then use something like the code below to show the temp:
 
 Humidity and temperature are measured at the same time using a single
 command, so for the humidity reading the temperature reading code can
-be re-used. Except that the raw 16 bit big-endian humidty value is stored
+be re-used. Except that the raw 16 bit big-endian humidity value is stored
 in bytes 3 and 4 of the response, so getting it can be done by:
 
 ```
