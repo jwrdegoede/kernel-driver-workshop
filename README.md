@@ -31,9 +31,9 @@ the main and devel kernel packages.
 2. If the above command installed a new kernel, then reboot into the new kernel.
 3. Install build tools and the devel package for the kernel which provides
 the necessary C headers for building kernel modules:
-    * Fedora/RHEL: `sudo dnf install make gcc kernel-devel`
-    * Debian/Ubuntu: `sudo apt install build-essential linux-headers-$(uname -r)`
-    * Arch Linux: `sudo pacman -S base-devel`
+    * Fedora/RHEL: `sudo dnf install make gcc kernel-devel i2c-tools`
+    * Debian/Ubuntu: `sudo apt install build-essential linux-headers-$(uname -r) i2c-tools`
+    * Arch Linux: `sudo pacman -S base-devel i2c-tools`
 4. Clone this git repo: `git clone https://github.com/jwrdegoede/kernel-driver-workshop.git`
 5. Build the provided drivers: `cd kernel-driver-workshop; make`
 6. Test that inserting kernel modules works: `sudo insmod i2c-ch341-usb.ko`
