@@ -26,12 +26,14 @@ distribution, this is necessary to avoid a version mismatch between
 the main and devel kernel packages.
     * Fedora/RHEL: `sudo dnf update 'kernel*'`
     * Debian/Ubuntu: `sudo apt update; sudo apt install linux-image-$(dpkg --print-architecture)`
+    * Arch Linux: `sudo pacman -Syu linux-headers`
 
 2. If the above command installed a new kernel, then reboot into the new kernel.
 3. Install build tools and the devel package for the kernel which provides
 the necessary C headers for building kernel modules:
     * Fedora/RHEL: `sudo dnf install make gcc kernel-devel`
     * Debian/Ubuntu: `sudo apt install build-essential linux-headers-$(uname -r)`
+    * Arch Linux: `sudo pacman -S base-devel`
 4. Clone this git repo: `git clone https://github.com/jwrdegoede/kernel-driver-workshop.git`
 5. Build the provided drivers: `cd kernel-driver-workshop; make`
 6. Test that inserting kernel modules works: `sudo insmod i2c-ch341-usb.ko`
